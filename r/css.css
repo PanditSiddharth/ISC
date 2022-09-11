@@ -1,0 +1,184 @@
+*{
+    margin: 0px;
+    padding: 0px;
+}
+
+.navbar{
+    display: flex;
+    list-style: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+header{
+    position: sticky;
+    top: 0;
+}
+.navbar li{
+    padding-left: 3px;
+}
+
+.navbar li a{
+    padding: 5px 5px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.navbar li a:hover{
+    color: red;
+}
+
+.logo img{
+    margin: 0px 15px;
+    width: 40px;
+    border-radius: 30px;
+}
+#search{
+    display: inline-block;
+    border-radius:5px;
+    font-size: large;
+    font-weight: bold;
+    
+}
+.leftnav{
+    display: flex;
+    width: 50%;
+    align-items: center;
+}
+.search{
+  float: right;
+  width: 50%;
+  text-align: right;
+  margin-right: 60px;
+}
+
+.search input{
+    align-items: right;
+    width: 150px;
+}
+.bg{
+    background: rgba(0, 0, 0, 0.7) url('b.jpg');
+    background-size: cover;
+    background-blend-mode: darken;
+}
+.boxmain{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 75%;
+    margin: auto;
+    height: 80%;
+}
+.sec1{
+    padding-top: 80px;
+    padding-bottom: 80px;
+    display: flex;
+}
+.firsthalf{
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.secondhalf img{
+    border: 1px solid red;
+    border-radius: 90px;
+    width: 70%;
+    display: block;
+    margin: auto;
+}
+
+.big{
+    font-size: 30px;
+}
+
+.small{
+    font-size: 20px;
+}
+
+.btn{
+    padding: 1px 3px;
+    color: white;
+    border: 3px solid white;
+    background: none;
+    font-weight: bold;
+    border-radius: 8px;
+    margin-right: 3px;
+}
+
+.buttons button{
+    margin-right: 10px;
+
+}
+.btn:hover{
+    padding: 1px 2px;
+    border: 4px solid white;
+    color: aqua;
+}
+
+.btn:active{
+    color: white;
+    border: 2px solid red;
+}
+.buttons{
+    margin-top: 16px;
+    margin-right: 15px;
+}
+
+.buttons button{
+    padding: 8px;
+}
+.buttons button:hover{
+    padding: 7px;
+}
+
+.secright{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: darkblue;
+}
+
+.sec2{
+    margin-top: 50px;
+    display: flex;
+    align-items: left;
+    justify-content: center;
+    max-width: 70%;
+    flex-direction: column;
+}
+
+.left{
+    flex-direction: row-reverse;
+}
+
+.imgfluid{
+    width: 200px;
+}
+.sectiontag{
+    border-radius: 9px;
+    /* background-color: rgb(39, 6, 6); */
+}
+.sectionsubtag{
+    font-family: Arial, Helvetica, sans-serif;
+}
+#services{
+    padding-bottom: 200px;
+}
+
+@media (max-width: 726px ){
+    header{
+        display: flex;
+        flex-direction: column;
+    }
+    .navbar{
+        flex-direction: column;
+    }
+    .leftnav{
+        flex-direction: column;
+    }
+
+}
