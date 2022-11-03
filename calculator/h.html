@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="css.css">
+</head>
+
+<body>
+    <h1>Simple Calculator</h1>
+    <section id="ctn" class="container">
+        <div class="calcbody">
+            <input type="text" value="4" id="inn" class="input">
+            <div class="btns">
+                <div class="row">
+                    <button value="c" style="color:red;" onclick="clickk(this)" name="">C</button>
+                    <button value="*2" onclick="clickk(this)" name="">x2</button>
+                    <button value="b" onclick="clickk(this)" name="">back</button>
+                    <button value="=" id="eq" onclick="clickk(this)" name="">=</button>
+                </div>
+                <div class="row">
+                    <button value="7" onclick="clickk(this)" name="">7</button>
+                    <button value="8" onclick="clickk(this)" name="">8</button>
+                    <button value="9" onclick="clickk(this)" name="">9</button>
+                    <button value="+" onclick="clickk(this)" name="">+</button>
+                </div>
+
+                <div class="row">
+                    <button value="4" onclick="clickk(this)" name="">4</button>
+                    <button value="5" onclick="clickk(this)" name="">5</button>
+                    <button value="6" onclick="clickk(this)" name="">6</button>
+                    <button value="-" onclick="clickk(this)" name="">-</button>
+                </div>
+
+                <div class="row">
+                    <button value="1" onclick="clickk(this)" name="">1</button>
+                    <button value="2" onclick="clickk(this)" name="">2</button>
+                    <button value="3" onclick="clickk(this)" name="">3</button>
+                    <button value="*" onclick="clickk(this)" name="">×</button>
+                </div>
+
+                <div class="row" id="last">
+                    <button value="." onclick="clickk(this)" name="">.</button>
+                    <button value="0" onclick="clickk(this)" name="">0</button>
+                    <button value="%" onclick="clickk(this)" name="">%</button>
+                    <button value="/" onclick="clickk(this)" name="">÷</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="js.js"></script>
+</body>
+
+</html>

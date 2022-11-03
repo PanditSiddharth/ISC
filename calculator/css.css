@@ -1,0 +1,48 @@
+.container{
+    background-color: blue;
+    height: 100vh;
+    /* justify-content: center; */
+    display: flex;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    padding-top: 10%;
+}
+.calcbody{
+    background-color: yellow;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.input{
+    margin: 10px 10px 30px 10px;
+    height: 40px;
+    width: 85%;
+
+}
+
+.btns{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    /* background-color: red; */
+    flex-direction: column;
+
+}
+
+.row{
+    display: flex;
+}
+
+.btns button{
+    color: white;
+    background-color: black;
+    min-width: 50px;
+    min-height: 30px;
+}
+#last{
+    margin-bottom: 10px;
+}
