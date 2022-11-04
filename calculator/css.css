@@ -25,6 +25,23 @@
 
 }
 
+#link{
+    display: flex;
+    width:20rem;
+    flex-direction: row;
+    background-color: red;
+    justify-content: right;
+}
+
+#link button{
+    width: 70px;
+    background-color: darkred;
+}
+
+#link a{
+    text-decoration: none;
+    color: white;
+}
 .btns{
     display: flex;
     align-items: center;
