@@ -18,8 +18,10 @@
 
 .input{
     margin: 10px 10px 30px 10px;
-    height: 40px;
-    width: 85%;
+    height: 50px;
+    width: 91%;
+    margin: 10px 10px 10% 10px;
+    font-size: medium;
 
 }
 
@@ -35,13 +37,15 @@
 
 .row{
     display: flex;
+    padding: 0px 10px;
 }
 
 .btns button{
     color: white;
     background-color: black;
-    min-width: 50px;
-    min-height: 30px;
+    min-width: 80px;
+    min-height: 50px;
+    font-size: medium;
 }
 #last{
     margin-bottom: 10px;

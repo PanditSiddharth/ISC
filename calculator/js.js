@@ -1,4 +1,4 @@
-document.getElementById("ctn").style.background = "green";
+// document.getElementById("ctn").style.background = "green";
 let inputt = document.getElementById("inn");
 let string = "";
 
