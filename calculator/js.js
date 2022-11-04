@@ -33,7 +33,27 @@ function clickk(element){
     cl();
 }
 
-setInterval(()=>{string = inputt.value;}, 100)
+setInterval(()=>{string = inputt.value;}, 100);
+let val = 0;
+let v = 0;
+let str = ["........","Kaisa laga calculator....", "YouTube button par....","Click karke use subscribe karlo....","Ye seekhne ke liye...."];
+
+setInterval(()=>{
+if(val == str[v].length-1){
+  v = (v + 1)%str.length; 
+  val = 0;
+  console.log(v);
+}
+val = (val + 1)%str[v].length;
+}, 100);
+
+setInterval(()=>{
+}, 100);
+
+
+setInterval(()=>{
+  inputt.placeholder = str[v].substr(0, val);
+}, 100);
 
 function cl(){
     string = inputt.value = "";
