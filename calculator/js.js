@@ -29,9 +29,9 @@ function clickk(element){
     string = string + element.value;
     inputt.value = string;
     Opr();
-    }
-    if(element.value == "c")
-    cl();
+  }
+  if(element.value == "c")
+  cl();
 }
 
 function ud(){string = inputt.value;}
@@ -64,11 +64,13 @@ function cl(){
 let op = ['+', '-', '*','/','.'];
 
 function Opr(){
+  console.log("yes");
 for(let i=0; i<op.length; i++){
   for(let j=0; j<op.length; j++){
     if(inputt.value.charAt(inputt.value.length-1) == op[i] && inputt.value.charAt(inputt.value.length-2) == op[j])
     {
       inputt.value = inputt.value.substr(0, inputt.value.length-2)+op[i];
+      string = inputt.value;
     }
   }
 }
