@@ -28,12 +28,14 @@ function clickk(element){
     console.log(element.value);
     string = string + element.value;
     inputt.value = string;
+    Opr();
     }
     if(element.value == "c")
     cl();
 }
 
-setInterval(()=>{string = inputt.value;}, 100);
+function ud(){string = inputt.value;}
+
 let val = 0;
 let v = 0;
 let str = ["........","Kaisa laga calculator....", "YouTube button par....","Click karke use subscribe karlo....","Ye seekhne ke liye...."];
@@ -42,7 +44,7 @@ setInterval(()=>{
 if(val == str[v].length-1){
   v = (v + 1)%str.length; 
   val = 0;
-  console.log(v);
+  // console.log(v);
 }
 val = (val + 1)%str[v].length;
 }, 100);
@@ -57,4 +59,22 @@ setInterval(()=>{
 
 function cl(){
     string = inputt.value = "";
+}
+
+let op = ['+', '-', '*','/','.'];
+
+function Opr(){
+for(let i=0; i<op.length; i++){
+  for(let j=0; j<op.length; j++){
+    if(inputt.value.charAt(inputt.value.length-1) == op[i] && inputt.value.charAt(inputt.value.length-2) == op[j])
+    {
+      inputt.value = inputt.value.substr(0, inputt.value.length-2)+op[i];
+    }
+  }
+}
+}
+
+function chng(){
+ud();
+Opr();
 }
