@@ -1,2 +1,2 @@
 # ISC
-This is ignou website
+This is ignou bot ... in development now

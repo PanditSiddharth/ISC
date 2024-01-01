@@ -1,10 +1,16 @@
-const https = require('https');
 const cheerio = require('cheerio');
 const axios = require('axios');
-const Tgind = require('tgind');
+const { Telegraf } = require('telegraf');
+
 const express = require('express');
 const app = express();
 // let hall = require('./hall.js')
+const https = require('https');
+const seller = require('./sell');
+const agent = new https.Agent({
+  rejectUnauthorized: false
+});
+
 app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
@@ -13,12 +19,10 @@ app.listen(3000, () => {
   console.log('Server started on port 3000');
 });
 
-const agent = new https.Agent({
-  rejectUnauthorized: false
-});
-
-let bot = new Tgind(process.env.TOKEN, { "start": true })
+let bot = new Telegraf(process.env.TOKEN, { handlerTimeout: 1000000 })
 // hall(bot)
+// pyq(bot)
+
 
 async function igres(data) {
   try {
@@ -70,55 +74,147 @@ async function igres(data) {
   }
 }
 
-bot.on("message", async (m) => {
+async function sleep(seconds) {
+  return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+}
+
+async function del(message_id, delTime = 10) {
   try {
+    await util.sleep(delTime);
+    if (message_id)
+      return await ctx.deleteMessage(message_id);
+    else
+      return await ctx.deleteMessage();
+  }
+  catch (error) {
+    return false;
+  }
+}
+/**
+ *
+ * @param message
+ * @param options
+ *
+ * You can give your message and in second param
+ * time to delete that message or in second you can add {"time": 10} // after 10 seconds message will be delete
+ *
+ */
+async function send(ctx, message, options = {}) {
+  try {
+    let time = 10;
+    if (typeof options === 'number')
+      time = options;
+    if (options.time) {
+      time = options.time;
+      delete options.time;
+    }
+    let m = await ctx.reply(message, options);
+    del(m.message_id, time);
+  }
+  catch (error) {
+  }
+}
 
-    //    return console.log(m)
-    if (m.text.startsWith("/start") || m.text.startsWith("/help"))
-      m.send("Use /isc <Your enrollment number> to see result").catch((err) => { })
+let util = { send, sleep, del }
 
+bot.start(async (ctx) => {
+  let m = ctx.message;
 
-    if (m.text.startsWith("/isc")) {
-      m.del(m.message_id).catch((err) => { })
+  if (m.chat.type == 'private') {
+    ctx.reply(`Hello ${m.from.first_name}, I am IGNOU Bot
+there are many things you can do here.
+Check our /services
+Check how to use this bot/help
+Login as 👇👇`, {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: "Seller",
+              callback_data: "seller"
+            },
+            {
+              text: "Student",
+              callback_data: "student"
+            }
+          ],
+          [
+            {
+              text: "Admin",
+              callback_data: "admin"
+            }
+          ]
+        ]
+      }
+    })
+  }
+  else {
+    ctx.reply(`Hello ${m.from.first_name}, I am IGNOU Bot
+there are many things you can do in this bot.
+Check our /services
+Check how to use this bot /help
+`)
+  }
+})
+
+bot.on("message", async (ctx, next) => {
+  try {
+    next()
+    let m = ctx.message;
+
+    if ((m.text + "").startsWith("/isc")) {
+      ctx.deleteMessage(m.message_id).catch((err) => { })
       let enr = m.text.match(/\d+/)
-      console.log(enr)
+
       if (!enr || enr[0].length < 9)
-        return m.send("invalid enrollment number use /isc <your enrollment no>").catch((err) => { })
+        return util.send(ctx, "invalid enrollment number: \nAfter writting /isc write your enrollment number", { time: 300 }).catch((err) => { })
 
       const replyMarkup = {
         inline_keyboard: [
-          [{ text: "Dec 22", callback_data: JSON.stringify({ "eno": enr[0], "text": "Dec22" }) },
-          { text: "June 22", callback_data: JSON.stringify({ "eno": enr[0], "text": "June22" }) },
-          { text: "Dec 21", callback_data: JSON.stringify({ "eno": enr[0], "text": "Dec21" }) }],
-          [{ text: "June 21", callback_data: JSON.stringify({ "eno": enr[0], "text": "June21" }) },
+          [{ text: "June 23", callback_data: JSON.stringify({ "eno": enr[0], "text": "June23" }) },
+          { text: "Dec 22", callback_data: JSON.stringify({ "eno": enr[0], "text": "Dec22" }) },
+          { text: "June 22", callback_data: JSON.stringify({ "eno": enr[0], "text": "June22" }) }],
+          [{ text: "Dec 21", callback_data: JSON.stringify({ "eno": enr[0], "text": "Dec21" }) },
+          { text: "June 21", callback_data: JSON.stringify({ "eno": enr[0], "text": "June21" }) },
           { text: "Close", callback_data: "close" }]
         ],
       };
 
-      m.send("For which result you want to see ?", { reply_markup: replyMarkup }).catch((err) => { })
+      send(ctx, "For which result you want to see ?", { reply_markup: replyMarkup }).catch((err) => { })
     }
   } catch (error) {
     console.error("message", error)
   }
 })
 
-bot.on("callback_query", async (m) => {
+bot.on("callback_query", async (ctx, next) => {
   try {
-    bot.answerCallbackQuery(m.id).catch((err) => { })
+
+    let m = ctx.update.callback_query;
+
+    if (!m.data.includes('eno') || !m.data.includes('text'))
+      return next()
+    ctx.answerCbQuery().catch((err) => { })
     // return console.log(m)
+    del(m.message_id).catch((er) => { })
     if (m.data == "close") {
-      console.log('yes')
-      return m.del(m.message_id).catch((err) => { })
+      return;
     }
-    m.del(m.message_id).catch((er) => { })
 
     let res = await igres(m.data)
-    if (res)
-      m.send(res).catch((err) => { })
+
+    if (res) {
+      if (res.match(/\d/))
+        return send(ctx, res).catch((err) => { })
+      util.send(ctx, "Your result has not declared yet for " + JSON.parse(m.data).text + " Session", { time: 80 }).catch((err) => { })
+
+    }
     else
-      m.send("Some error with this enrollment or in date you seleceted").catch((err) => { })
+      util.send(ctx, "Some error with this enrollment or in date you seleceted", { time: 20 }).catch((err) => { })
 
   } catch (error) {
     console.error("query", error)
   }
 })
+
+seller(bot, util)
