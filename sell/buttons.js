@@ -9,6 +9,17 @@ let btn = (...args) => {
   return buttons;
 }
 
+let btnh = (...args) => {
+  return args.map(text => ({ text }));
+};
+
+let rpmh = (...args) => {
+  return { keyboard: args,
+         resize_keyboard: true,
+         one_time_keyboard: true,
+         selective: true }
+}
+
 let rpm = (...args) => {
   buttons = [];
   for (let i = 0; i < args.length; i++) {
@@ -18,7 +29,9 @@ let rpm = (...args) => {
 }
 
 let sel = {
-  main: rpm(btn("Details", "selDetails")),
+  main: rpm(btn("Details", "selDetails", "Edit", "selEdit", "Delete", "selDelete"),
+    btn("Add Product", "selAddProduct", "Your Products", "selProducts")
+  ),
   Edit: rpm(btn("Edit", "selEdit"), btn("DeleteId", "selDelete"))
 }
 
@@ -29,7 +42,10 @@ utl = {
   mainBack: rpm(btn("Main", "main", "Back", "back")),
   mainCancel: rpm(btn("Main", "main", "Cancel", "cancel")),
   skipBack: rpm(btn("Skip", "skip", "Cancel", "cancel", "Back", "back")),
-  skipCancel: rpm(btn("Skip", "skip", "Cancel", "cancel"))
+  skipCancel: rpm(btn("Skip", "skip", "Cancel", "cancel")),
+  cancelBack: rpm(btn("Back", "back", "Cancel", "cancel")),
+  cancelSubmit: rpm(btn("Submit", "submit", "Cancel", "cancel")),
+  // cancelSubmit: rpm(btn("Approve", "approve", "Reject", "reject"))
 }
 
 adm = {
@@ -41,4 +57,4 @@ let stu = {
 
 }
 
-module.exports = { rpm, sel, utl, btn, stu }
+module.exports = { rpm, sel, utl, btn, stu, btn, btnh, rpmh }

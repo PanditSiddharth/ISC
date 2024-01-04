@@ -11,7 +11,7 @@ const sellerSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  org: {
+  shop: {
     type: String,
     default: "none"
   },
@@ -60,7 +60,7 @@ const studentSchema = new mongoose.Schema({
   },
   degree: {
     type: String,
-    default: "none"
+    default: ""
   },
   stuName: { 
     type: String,
@@ -71,11 +71,11 @@ const studentSchema = new mongoose.Schema({
   },
   address: { // code which will be excecuted
     type: String,
-    default: "none"
+    default: ""
   },
   description: {
     type: String,
-    default: "none"
+    default: ""
   }, // command description
   level: {
     type: Number
@@ -143,4 +143,52 @@ const docSchema = new mongoose.Schema({
 
 const docd = mongoose.model('document', docSchema);
 
-module.exports = { seld, stud, docd };
+
+const tempSSchema = new mongoose.Schema({
+  sellerId: {
+    type: Number,
+    required: true,
+    unique: true
+  },
+  shop: {
+    type: String,
+    default: "none"
+  },
+  sellerName: { // command from which will user can run code
+    type: String,
+    required: true,
+  },
+  sellerPhone: { 
+    type: String,
+    required: true
+  },
+  address: { 
+    type: String,
+    default: "none"
+  },
+  description: {
+    type: String,
+    default: "none"
+  }, 
+  level: {
+    type: Number
+  },
+  soldItems: {
+    type: Number
+  },
+  soldItemsPrice: {
+    type: Number
+  },
+  pic: {
+    type: Number,
+    default: 0
+  },
+  timestamp: {
+    type: String,
+    default: new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })
+  }
+});
+
+const tempsd = mongoose.model('temps', tempSSchema);
+
+module.exports = { seld, stud, docd, tempsd };
