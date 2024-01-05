@@ -183,6 +183,10 @@ const tempSSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  status: {
+    type: String,
+    default: "none" // none, pending, approved, rejected
+  },
   timestamp: {
     type: String,
     default: new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })

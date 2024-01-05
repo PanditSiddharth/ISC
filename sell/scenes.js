@@ -2,8 +2,8 @@ const { Scenes, session, Composer } = require('telegraf');
 // sel = seller, stu = student, adm = admin, utl = utility
 let { sel, stu, adm, utl, rpm, btn } = require("./buttons");
 let { seld, stud, tempsd } = require("./db");
-let { sellers, seller, editText, cato } = require("./globals");
-let { edit, editW, sendW, sleep } = require("./utils");
+let { sellers, seller, editText, cato, sSteps } = require("./globals");
+let { edit, editR, editW, sendW, sleep } = require("./utils");
 
 function isQuery(ctx, opt = {}) {
 
@@ -186,39 +186,6 @@ const { WizardScene } = Scenes;
 //   }
 // );
 
-async function editR(ctx, txt, options = {}) {
-  if (!sellers[ctx.from.id]) {
-    sellers[ctx.from.id] = {};
-    let selinfo = sellers[ctx.from.id];
-    selinfo.sellerId = ctx.from.id;
-    selinfo.sellerName = ctx.from.first_name + " " +
-      ctx.from.last_name;
-    selinfo.timestamp = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
-  }
-
-  if (ctx.message)
-    ctx.deleteMessage().catch(err => { console.error(err) })
-  
-  let mes = {};
-  if (!sellers[ctx.from.id].mid) {
-    mes = await ctx.reply(txt, options).catch((err) => { console.log(err) });
-    sellers[ctx.from.id].mid = mes.message_id;
-  } 
-    
-  else {
-    mes = await ctx.telegram.editMessageText(ctx.chat.id, sellers[ctx.from.id].mid, undefined, txt, options
-    ).catch(async (err) => {
-      if (sellers[ctx.from.id].mid)
-        ctx.deleteMessage().catch(err => { console.error(err) });
-
-      mes = await ctx.reply(txt, options).catch((errr) => { console.log(errr) });
-      sellers[ctx.from.id].mid = mes.message_id;
-    })
-  }
-  return mes;
-}
-
-
 let selE = new Scenes.BaseScene('seller-edit');
 selE.enter(async (ctx) => { })
 selE.on("message", async ctx => {
@@ -266,81 +233,73 @@ selE.on("callback_query", async ctx => {
 
 let selR = new Scenes.BaseScene('seller-reg');
 
-let sSteps = ["sellerName", "sellerPhone",  "shop", "address", "description", "pic", "verify"]
-
-selR.enter(async (ctx) => {
-  editR(ctx, "Enter your original name: ", { reply_markup: utl.skipCancel }).catch(err => { console.error(err) })
-  sellers[ctx.from.id] = {}
-  sellers[ctx.from.id].req = "sellerName";
-})
-
 let selReg = async ctx => {
-    let text = ctx.message.text;
-    if (!sellers[ctx.from.id] || !sellers[ctx.from.id].req)
-      return;
 
-  if (sellers[ctx.from.id].req == "sellerName") {
-    let selInfo = sellers[ctx.from.id]
-        sellers[ctx.from.id].sellerName = ctx?.message?.text
+  // check and initializations
+  if (!ctx.message)
+    ctx.update.message = ctx?.callbackQuery?.message
+  let text = ctx.message.text;
+  if (!sellers[ctx.from.id] || !sellers[ctx.from.id].sellerName)
+    await seller(ctx)
+  let selInfo = sellers[ctx.from.id]
 
-      editR(ctx, `Enter your current calling number: 
-      You can enter your any other number or if your telegrams number is callable then click on bellow button: `, { reply_markup: utl.cancelBack }).catch(err => { console.error(err) })
-      sellers[ctx.from.id].req = "sellerPhone";
+  let add = a => {
+    if (ctx.callbackQuery || "enter" == selInfo.req) {
 
-    } 
-  else if(sellers[ctx.from.id].req == "sellerPhone") {
-        sellers[ctx.from.id].sellerPhone = ctx.message.text;
-      editR(ctx, `Enter your shop name: `, { reply_markup: utl.skipBack }).catch(err => { console.error(err) })
+    } else
+      selInfo[selInfo.req] = text;
 
-      sellers[ctx.from.id].req = "shop";
-    }  
+    if (sSteps.length - sSteps.indexOf(selInfo.req) >= 0)
+      selInfo.req = sSteps[sSteps.indexOf(selInfo.req) + 1]
+  }
+
+  // first step
+  if (sellers[ctx.from.id].req == "enter") {
+    add()
+    editR(ctx, `Enter Your name or skip: `, { reply_markup: utl.skipCancel }).catch(err => { console.error(err) })
+  }
+
+  // second step
+  else if (sellers[ctx.from.id].req == "sellerName") {
+    add()
+    editR(ctx, `Enter your current calling number: 
+You can enter your any other number or if your telegrams number is callable then click on bellow button: `, { reply_markup: rpm(btn("Back", "back", "Cancel", "cancel")) }).catch(err => { console.error(err) })
+  }
+
+  // third step
+  else if (sellers[ctx.from.id].req == "sellerPhone") {
+    add()
+    editR(ctx, `Enter your shop name: `, { reply_markup: utl.skipBack }).catch(err => { console.error(err) })
+  }
+
+  // fourt step
   else if (sellers[ctx.from.id].req == "shop") {
-      sellers[ctx.from.id].shop = ctx.message.text;
+    add()
+    editR(ctx, `Enter your address: `, { reply_markup: utl.skipBack }).catch(err => { console.error(err) })
+  }
 
-      editR(ctx, `Enter your address: `, { reply_markup: utl.skipBack }).catch(err => { console.error(err) })
-      sellers[ctx.from.id].req = "address";
-
-      } 
+  // 5th step 
   else if (sellers[ctx.from.id].req == "address") {
-      sellers[ctx.from.id].address = ctx.message.text;
-      editR(ctx, `Enter about yourself: `, { reply_markup: utl.skipBack }).catch(err => { console.error(err) })
-      sellers[ctx.from.id].req = "description";
-    } 
-  else if(sellers[ctx.from.id].req == "description") {
-      sellers[ctx.from.id].description = ctx.message.text;
+    add()
+    editR(ctx, `Enter about yourself: `, { reply_markup: utl.skipBack }).catch(err => { console.error(err) })
+  }
+  // 6th step
+  else if (sellers[ctx.from.id].req == "description") {
+    add()
+    editR(ctx, `Send your pic: `, { reply_markup: utl.cancelBack }).catch(err => { console.error(err) })
+  }
 
-      editR(ctx, `Send your pic: `, { reply_markup: utl.cancelBack }).catch(err => { console.error(err) })
-      sellers[ctx.from.id].req = "pic";
-    }  
-  else if(sellers[ctx.from.id].req == "pic") {
-    let selInfo = sellers[ctx.from.id]
-      if (!ctx.message.photo) {
-        return editR(ctx, `Send your pic: `, { reply_markup: utl.cancel })
-      }
+  // seventh step
+  else if (sellers[ctx.from.id].req == "pic") {
+    if (ctx.callbackQuery)
+      return
 
-      let mesText = `Name: ${selInfo.sellerName}
-      Id: ${selInfo.sellerId}
-      Phone: ${selInfo.sellerPhone}
-      Address: ${selInfo.address}
-      Shop: ${selInfo.shop}
-      About: ${selInfo.description}
-      Level: ${selInfo.level}
-      SoldIdtems: ${selInfo.soldItems}
-      SoldItemsPrice: ${selInfo.soldItemsPrice}
-      Time: ${selInfo.timestamp}
-            `
-      let cpMes = await ctx.telegram.copyMessage(ctx.chat.id, ctx.chat.id, ctx.message.message_id).catch(err => { console.error(err) })
-
-      ctx.telegram.editMessageCaption(ctx.chat.id, cpMes.message_id, undefined, "Verify your detils: \n\n" + mesText, { reply_markup: utl.cancelSubmit }).catch(err => { console.error(err) })
-      sellers[ctx.from.id].mid = cpMes.message_id;
-
-      sellers[ctx.from.id].req = "verify";
+    if (!ctx.message.photo) {
+      return editR(ctx, `Send your pic: `, { reply_markup: utl.cancelBack })
     }
-  else if(sellers[ctx.from.id].req == "verify") {
 
-     let selInfo = sellers[ctx.from.id]
-
-        let mesText = `Name: ${selInfo.sellerName}
+    let mesText = `
+    Name: ${selInfo.sellerName}
     Id: ${selInfo.sellerId}
     Phone: ${selInfo.sellerPhone}
     Address: ${selInfo.address}
@@ -350,55 +309,40 @@ let selReg = async ctx => {
     SoldIdtems: ${selInfo.soldItems}
     SoldItemsPrice: ${selInfo.soldItemsPrice}
     Time: ${selInfo.timestamp}
-      `
-        let cpMes = await ctx.telegram.copyMessage(process.env.TO_CHAT, ctx.chat.id, ctx.callbackQuery.message.message_id).catch(err => { console.error(err) })
+            `
+    let cpMes = await ctx.telegram.copyMessage(ctx.chat.id, ctx.chat.id, ctx.message.message_id).catch(err => { console.error(err) })
 
-        selInfo.pic = cpMes.message_id;
-        // ctx.reply(`Thank you, ! Registration completed.`);
-        ctx.telegram.editMessageCaption(process.env.TO_CHAT, cpMes.message_id, undefined, mesText, { reply_markup: rpm(btn("Submit", "submit" + ctx.from.id, "Cancel", "cancel" + ctx.from.id)) }).catch(err => { console.error(err) })
-        delete sellers[ctx.from.id].mid
-        delete sellers[ctx.from.id].no
-        delete sellers[ctx.from.id].req
-        let found = await tempsd.findOne({ sellerId: ctx.from.id }).catch(err => { console.error(err) })
-        if (!found) {
-          let inst = await tempsd.create(selInfo).catch(err => { console.error(err) })
-          if (!inst)
-            return editW(ctx, "Something went wrong, try again later. or say to @PanditSiddharth")
-        } else {
-          let upd = await tempsd.updateOne({ sellerId: ctx.from.id }, { $set: selInfo }, { upsert: true }).catch(err => { console.error(err) })
-        }
-        editR(ctx, "Thanks! Your registration completed please verify your self by messaging to @panditsiddharth").catch(err => { console.error(err) })
-
+    ctx.telegram.editMessageCaption(ctx.chat.id, cpMes.message_id, undefined, "Verify your detils: \n" + mesText, { reply_markup: rpm(btn("Submit", "selSubmitReg", "Cancel", "selCancelReg")) }).catch(err => { console.error(err) })
+    sellers[ctx.from.id].mid = cpMes.message_id;
+    console.log(cpMes)
+    ctx.scene.leave()
   }
 }
+
+selR.enter(selReg)
 selR.on("message", selReg)
 
-selR.on("callback_query", async ctx => { 
-  let cb = ctx.callbackQuery; 
-  let ctxx = Object.assign({}, ctx)
-
-  let data = cb.data
-  ctxx.message = ctx.callbackQuery.message;
-ctxx.message.from = ctx.from;
-  ctxx.from = ctx.from;
-console.log(ctxx.message)
-ctx.message = {}
-  
-ctx.message = Object.assign({}, ctx.message)
-  let kx = {...ctx, message: ctxx.message, from: ctx.from}
-  // ctx.message.from = ctxx.update?.callback_query?.from;
- console.log(kx)
+// seller registration Query
+selR.on("callback_query", async ctx => {
+  // initialization
+  let cb = ctx.callbackQuery;
+  let data = cb.data;
+  ctx.update.message = ctx.callbackQuery.message;
+  ctx.message.from = ctx.from
   let sl = sellers[ctx.from.id]
+
+  // start chekcks
   if (data == 'skip') {
-  sl.req = sSteps[sSteps.indexOf(sl.req) + 1] 
-    selReg(kx)
+    sl.req = sSteps[sSteps.indexOf(sl.req)]
+    selReg(ctx)
   } else if (data == "cancel") {
-    ctx.deleteMessage(ctx.callbackQuery.message.message_id).catch(er => { console.error(er) });
-    sellers[ctx.from.id] = {};
+    ctx.deleteMessage().catch(er => { console.error(er) });
+    sellers[ctx.from.id] = null;
+    delete sellers[ctx.from.id];
     ctx.scene.leave();
   } else if (data == "back") {
-    sl.req = sSteps[sSteps.indexOf(sl.req) - 1] 
-    
+    sl.req = sSteps[sSteps.indexOf(sl.req) - 2]
+    selReg(ctx)
   } else if (data == "main") {
   }
 })
